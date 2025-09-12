@@ -101,6 +101,8 @@ class PaymentProvider(models.Model):
         if self.code != 'montypay':
             return super()._get_payment_link(tx_sudo, **kwargs)
 
+        base_url = tx_sudo.get_base_url()
+        
         # Prepare order data
         order_data = {
             'number': tx_sudo.reference,
@@ -121,18 +123,17 @@ class PaymentProvider(models.Model):
         payload = {
             'merchant_key': self.montypay_merchant_key,
             'operation': 'purchase',
-            'success_url': urljoin(tx_sudo.get_base_url(), '/payment/montypay/return'),
-            'cancel_url': urljoin(tx_sudo.get_base_url(), '/payment/montypay/cancel'),
+            'success_url': f"{base_url}/payment/montypay/return",
             'hash': hash_value,
             'order': order_data,
             'billing_address': {
-                'country': tx_sudo.partner_country_id.code or 'US',
+                'country': tx_sudo.partner_country_id.code if tx_sudo.partner_country_id else 'US',
                 'address': tx_sudo.partner_address or 'N/A',
                 'phone': tx_sudo.partner_phone or 'N/A'
             },
             'customer': {
-                'email': tx_sudo.partner_email,
-                'name': tx_sudo.partner_name
+                'email': tx_sudo.partner_email or 'customer@example.com',
+                'name': tx_sudo.partner_name or 'Customer'
             }
         }
 

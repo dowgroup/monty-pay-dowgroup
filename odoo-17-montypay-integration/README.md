@@ -25,9 +25,10 @@ This module integrates MontyPay payment gateway with Odoo 17 Community Edition's
    - Search for "MontyPay"
    - Install the module
 
-3. **Replace placeholder images** with actual MontyPay brand assets:
-   - `static/src/img/montypay_logo.png` (200x60px recommended)
-   - `static/src/img/montypay_icon.png` (32x32px recommended)
+3. **Add MontyPay brand assets** (Optional):
+   - Add `static/src/img/montypay_logo.png` (200x60px recommended)
+   - Add `static/src/img/montypay_icon.png` (32x32px recommended)
+   - Update templates to use these images if desired
 
 ## Configuration
 
@@ -180,4 +181,4 @@ This module is licensed under LGPL-3.
 
 ---
 
-**Note**: Replace placeholder images with actual MontyPay brand assets before going live. Contact MontyPay for official logos and branding guidelines.
+**Note**: Add MontyPay brand assets for a professional appearance. Contact MontyPay for official logos and branding guidelines. The module works without images using text-based branding.

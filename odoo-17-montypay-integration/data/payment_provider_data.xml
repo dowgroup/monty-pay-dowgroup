@@ -7,27 +7,10 @@
             <field name="code">montypay</field>
             <field name="state">disabled</field>
             <field name="is_published">False</field>
-            <field name="payment_icon_ids" eval="[(6, 0, [
-                ref('payment.payment_icon_cc_visa'),
-                ref('payment.payment_icon_cc_mastercard'),
-                ref('payment.payment_icon_cc_amex'),
-                ref('payment.payment_icon_cc_discover')
-            ])]"/>
             <field name="allow_tokenization">False</field>
             <field name="capture_manually">False</field>
             <field name="allow_express_checkout">False</field>
-            <field name="redirect_form_view_id" ref="payment_redirect_form_montypay"/>
-            <field name="module_id" ref="base.module_payment_montypay"/>
-            <field name="image_128" type="base64" file="payment_montypay/static/src/img/montypay_logo.png"/>
-        </record>
-
-        <!-- MontyPay Payment Methods -->
-        <record id="payment_method_montypay_card" model="payment.method">
-            <field name="name">Credit/Debit Card</field>
-            <field name="code">card</field>
-            <field name="primary_payment_method_id" ref="payment.payment_method_card"/>
-            <field name="provider_ids" eval="[(6, 0, [ref('payment_provider_montypay')])]"/>
-            <field name="image_128" type="base64" file="payment_montypay/static/src/img/montypay_icon.png"/>
+            <field name="montypay_environment">sandbox</field>
         </record>
 
     </data>
