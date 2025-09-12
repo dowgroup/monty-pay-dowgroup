@@ -21,7 +21,6 @@ Features:
     'license': 'LGPL-3',
     'depends': [
         'payment',
-        'website_sale',
     ],
     'data': [
         'security/ir.model.access.csv',

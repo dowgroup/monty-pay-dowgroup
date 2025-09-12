@@ -1,26 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- MontyPay Payment Provider Form View -->
-        <record id="payment_provider_form_montypay" model="ir.ui.view">
-            <field name="name">MontyPay Provider Form</field>
+        <!-- MontyPay Configuration Form -->
+        <record id="view_payment_provider_form_montypay" model="ir.ui.view">
+            <field name="name">MontyPay Payment Provider Configuration</field>
             <field name="model">payment.provider</field>
-            <field name="inherit_id" ref="payment.payment_provider_form"/>
             <field name="arch" type="xml">
-                <xpath expr="//group[@name='provider_credentials']" position="after">
-                    <group name="montypay_credentials" 
-                           invisible="code != 'montypay'">
-                        <group string="MontyPay Credentials" name="montypay_config">
-                            <field name="montypay_merchant_key" 
-                                   password="True" 
-                                   placeholder="e.g., 899de86c-6b8f-11f0-9e25-6ecbc8c8662d"/>
-                            <field name="montypay_merchant_pass" 
-                                   password="True" 
-                                   placeholder="e.g., fc10f720fbe7e1e3f79d04b5b0eda2ab"/>
-                            <field name="montypay_environment"/>
+                <form string="MontyPay Configuration">
+                    <sheet>
+                        <group>
+                            <group string="Basic Configuration">
+                                <field name="name"/>
+                                <field name="code" readonly="1"/>
+                                <field name="state"/>
+                                <field name="is_published"/>
+                            </group>
+                            <group string="MontyPay Credentials" 
+                                   invisible="code != 'montypay'">
+                                <field name="montypay_merchant_key" 
+                                       password="True" 
+                                       placeholder="e.g., 899de86c-6b8f-11f0-9e25-6ecbc8c8662d"/>
+                                <field name="montypay_merchant_pass" 
+                                       password="True" 
+                                       placeholder="e.g., fc10f720fbe7e1e3f79d04b5b0eda2ab"/>
+                                <field name="montypay_environment"/>
+                            </group>
                         </group>
-                        <group string="Information" name="montypay_info">
-                            <div class="text-muted" colspan="2">
+                        
+                        <group string="Information" 
+                               invisible="code != 'montypay'">
+                            <div class="text-muted">
                                 <p><strong>MontyPay Configuration:</strong></p>
                                 <ul>
                                     <li>Get your credentials from MontyPay dashboard</li>
@@ -29,42 +38,22 @@
                                     <li>Supported currencies: USD, EUR, GBP</li>
                                 </ul>
                                 <p><strong>Test Cards:</strong></p>
-                                <p>Use test cards from: 
-                                   <a href="https://test-gateway.mastercard.com/api/documentation/integrationGuidelines/supportedFeatures/testAndGoLive.html" target="_blank">
-                                       Mastercard Test Cards
-                                   </a>
-                                </p>
+                                <p>Use test cards from Mastercard documentation</p>
                             </div>
                         </group>
-                    </group>
-                </xpath>
+                    </sheet>
+                </form>
             </field>
         </record>
 
-        <!-- MontyPay Payment Transaction Tree View -->
-        <record id="payment_transaction_view_tree_montypay" model="ir.ui.view">
-            <field name="name">MontyPay Transaction Tree</field>
-            <field name="model">payment.transaction</field>
-            <field name="inherit_id" ref="payment.payment_transaction_view_tree"/>
-            <field name="arch" type="xml">
-                <xpath expr="//field[@name='reference']" position="after">
-                    <field name="montypay_session_id" 
-                           invisible="provider_code != 'montypay'"/>
-                </xpath>
-            </field>
-        </record>
-
-        <!-- MontyPay Payment Transaction Form View -->
-        <record id="payment_transaction_view_form_montypay" model="ir.ui.view">
-            <field name="name">MontyPay Transaction Form</field>
-            <field name="model">payment.transaction</field>
-            <field name="inherit_id" ref="payment.payment_transaction_view_form"/>
-            <field name="arch" type="xml">
-                <xpath expr="//group[@name='provider_details']" position="inside">
-                    <field name="montypay_session_id" 
-                           invisible="provider_code != 'montypay'"/>
-                </xpath>
-            </field>
+        <!-- MontyPay Provider Action -->
+        <record id="action_payment_provider_montypay" model="ir.actions.act_window">
+            <field name="name">MontyPay Configuration</field>
+            <field name="res_model">payment.provider</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_payment_provider_form_montypay"/>
+            <field name="domain">[('code', '=', 'montypay')]</field>
+            <field name="context">{'default_code': 'montypay'}</field>
         </record>
 
     </data>

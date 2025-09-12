@@ -1,28 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <!-- MontyPay Payment Form Template -->
-        <template id="payment_form_montypay" name="MontyPay Payment Form">
-            <div class="o_payment_form_montypay p-3">
-                <div class="d-flex align-items-center mb-3">
-                    <strong class="me-3" style="color: #007bff;">MontyPay</strong>
-                    <span class="text-muted">Secure payment powered by MontyPay</span>
-                </div>
-                
-                <div class="alert alert-info">
-                    <i class="fa fa-info-circle me-2"></i>
-                    You will be redirected to MontyPay's secure payment page to complete your transaction.
-                </div>
-            </div>
-        </template>
-
-        <!-- MontyPay Payment Form Integration -->
-        <template id="payment_form_montypay_inherit" name="MontyPay Inline Form" inherit_id="payment.payment_form">
-            <xpath expr="//div[hasclass('o_payment_form_container')]" position="inside">
-                <t t-if="provider_sudo.code == 'montypay'">
-                    <t t-call="payment_montypay.payment_form_montypay"/>
-                </t>
-            </xpath>
+        
+        <!-- MontyPay Payment Redirect Template -->
+        <template id="montypay_redirect" name="MontyPay Redirect">
+            <html>
+                <head>
+                    <title>Redirecting to MontyPay...</title>
+                </head>
+                <body>
+                    <div class="text-center p-5">
+                        <h3>Redirecting to MontyPay...</h3>
+                        <p>Please wait while we redirect you to MontyPay's secure payment page.</p>
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                    <script type="text/javascript">
+                        window.location.href = '<t t-esc="redirect_url"/>';
+                    </script>
+                </body>
+            </html>
         </template>
 
     </data>
