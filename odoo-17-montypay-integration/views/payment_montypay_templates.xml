@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <!-- MontyPay Payment Form Template -->
+        <template id="payment_form_montypay" name="MontyPay Payment Form">
+            <div class="card-body o_payment_form_montypay">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="payment_montypay_logo">
+                            <img src="/payment_montypay/static/src/img/montypay_logo.png" 
+                                 alt="MontyPay" 
+                                 style="max-height: 40px;"/>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <p class="text-muted mb-0">
+                            Secure payment powered by MontyPay
+                        </p>
+                    </div>
+                </div>
+                
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle me-2"></i>
+                            You will be redirected to MontyPay secure payment page to complete your transaction.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+        <!-- MontyPay Payment Method Display -->
+        <template id="payment_method_montypay" name="MontyPay Payment Method" inherit_id="payment.payment_methods">
+            <xpath expr="//t[@t-elif='provider_sudo.code == &quot;custom&quot;']" position="before">
+                <t t-elif="provider_sudo.code == 'montypay'">
+                    <div class="d-flex align-items-center">
+                        <img src="/payment_montypay/static/src/img/montypay_icon.png" 
+                             alt="MontyPay" 
+                             class="me-2" 
+                             style="max-height: 24px;"/>
+                        <span>Credit/Debit Card (MontyPay)</span>
+                    </div>
+                </t>
+            </xpath>
+        </template>
+
+        <!-- MontyPay Redirection Form -->
+        <template id="payment_redirect_form_montypay" name="MontyPay Redirect Form">
+            <div class="text-center">
+                <h3>Redirecting to MontyPay...</h3>
+                <p>Please wait while we redirect you to MontyPay secure payment page.</p>
+                <div class="spinner-border text-primary" role="status">
+                    <span class="sr-only">Loading...</span>
+                </div>
+                <form id="montypay_redirect_form" method="GET" t-att-action="api_url">
+                    <script type="text/javascript">
+                        document.getElementById('montypay_redirect_form').submit();
+                    </script>
+                </form>
+            </div>
+        </template>
+
+        <!-- MontyPay Status Page -->
+        <template id="payment_status_montypay" name="MontyPay Payment Status">
+            <div class="container mt-5">
+                <div class="row justify-content-center">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-body text-center">
+                                <t t-if="status == 'success'">
+                                    <i class="fa fa-check-circle text-success" style="font-size: 4rem;"></i>
+                                    <h3 class="mt-3">Payment Successful!</h3>
+                                    <p>Your payment has been processed successfully.</p>
+                                </t>
+                                <t t-elif="status == 'failed'">
+                                    <i class="fa fa-times-circle text-danger" style="font-size: 4rem;"></i>
+                                    <h3 class="mt-3">Payment Failed</h3>
+                                    <p>Your payment could not be processed. Please try again.</p>
+                                </t>
+                                <t t-else="">
+                                    <i class="fa fa-clock-o text-warning" style="font-size: 4rem;"></i>
+                                    <h3 class="mt-3">Payment Pending</h3>
+                                    <p>Your payment is being processed. You will receive confirmation shortly.</p>
+                                </t>
+                                <a href="/shop" class="btn btn-primary mt-3">Continue Shopping</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </template>
+
+    </data>
+</odoo>

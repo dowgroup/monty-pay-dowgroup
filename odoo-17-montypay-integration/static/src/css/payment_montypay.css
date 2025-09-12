@@ -1,0 +1,90 @@
+/* MontyPay Payment Provider Styles */
+
+.o_payment_form_montypay {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+.payment_montypay_logo img {
+    max-height: 40px;
+    width: auto;
+}
+
+.o_payment_form_montypay .alert-info {
+    background-color: #e3f2fd;
+    border-color: #bbdefb;
+    color: #1976d2;
+    border-radius: 6px;
+    font-size: 14px;
+}
+
+.o_payment_montypay_icon {
+    max-height: 24px;
+    width: auto;
+    margin-right: 8px;
+}
+
+/* Payment method selection styling */
+.o_payment_option_card.o_payment_montypay {
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.o_payment_option_card.o_payment_montypay:hover {
+    border-color: #007bff;
+    box-shadow: 0 2px 10px rgba(0, 123, 255, 0.1);
+}
+
+.o_payment_option_card.o_payment_montypay.active {
+    border-color: #007bff;
+    background-color: #f8f9ff;
+}
+
+/* Loading state */
+.montypay_loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(0, 123, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #007bff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .payment_montypay_logo img {
+        max-height: 32px;
+    }
+    
+    .o_payment_form_montypay {
+        padding: 15px;
+    }
+}
+
+/* Security badge */
+.montypay_security_badge {
+    font-size: 12px;
+    color: #28a745;
+    font-weight: 600;
+}
+
+.montypay_security_badge i {
+    margin-right: 4px;
+}
+
+/* Error states */
+.montypay_error {
+    color: #dc3545;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.montypay_error i {
+    margin-right: 6px;
+}

@@ -1,0 +1,4 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_payment_provider_montypay,payment.provider.montypay,payment.model_payment_provider,base.group_system,1,1,1,1
+access_payment_transaction_montypay,payment.transaction.montypay,payment.model_payment_transaction,base.group_user,1,0,0,0
+access_payment_transaction_montypay_manager,payment.transaction.montypay.manager,payment.model_payment_transaction,account.group_account_invoice,1,1,1,1
