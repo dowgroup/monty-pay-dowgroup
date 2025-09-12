@@ -86,11 +86,13 @@ Use MontyPay's sandbox environment for testing:
 Refer to MontyPay's documentation for approved test card numbers.
 
 ## Supported Currencies
+The module supports all currencies available in your Odoo installation. MontyPay typically supports:
 - USD (US Dollar)
-- EUR (Euro)
+- EUR (Euro)  
 - GBP (British Pound)
+- And other major currencies depending on your MontyPay account configuration
 
-*Additional currencies can be added by modifying the `_get_supported_currencies()` method.*
+*Currency support depends on your MontyPay account settings and active currencies in Odoo.*
 
 ## File Structure
 ```

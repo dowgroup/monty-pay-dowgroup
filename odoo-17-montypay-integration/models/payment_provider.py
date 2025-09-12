@@ -42,11 +42,6 @@ class PaymentProvider(models.Model):
         required_if_provider='montypay'
     )
 
-    @api.model
-    def _get_compatible_providers(self, *args, company_id=None, **kwargs):
-        """ Override to include MontyPay in compatible providers. """
-        providers = super()._get_compatible_providers(*args, company_id=company_id, **kwargs)
-        return providers.filtered(lambda p: p.code != 'montypay' or p.state != 'disabled')
 
     def _get_base_url(self):
         """ Return the base URL for MontyPay API based on environment. """
@@ -83,18 +78,7 @@ class PaymentProvider(models.Model):
             _logger.error("MontyPay API request failed: %s", e)
             raise ValidationError(_("Payment communication error. Please try again."))
 
-    def _get_supported_currencies(self):
-        """ Return supported currencies for MontyPay. """
-        montypay_currencies = ['USD', 'EUR', 'GBP']  # Add more as supported
-        if self.code == 'montypay':
-            return montypay_currencies
-        return super()._get_supported_currencies()
 
-    def _get_default_payment_method_codes(self):
-        """ Return default payment method codes for MontyPay. """
-        if self.code == 'montypay':
-            return ['card']
-        return super()._get_default_payment_method_codes()
 
     def _get_payment_link(self, tx_sudo, **kwargs):
         """ Create MontyPay payment session and return redirect URL. """
