@@ -9,7 +9,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='provider_credentials']" position="after">
                     <group name="montypay_credentials" 
-                           attrs="{'invisible': [('code', '!=', 'montypay')]}">
+                           invisible="code != 'montypay'">
                         <group string="MontyPay Credentials" name="montypay_config">
                             <field name="montypay_merchant_key" 
                                    password="True" 
@@ -49,7 +49,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//field[@name='reference']" position="after">
                     <field name="montypay_session_id" 
-                           attrs="{'invisible': [('provider_code', '!=', 'montypay')]}"/>
+                           invisible="provider_code != 'montypay'"/>
                 </xpath>
             </field>
         </record>
@@ -62,7 +62,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//group[@name='provider_details']" position="inside">
                     <field name="montypay_session_id" 
-                           attrs="{'invisible': [('provider_code', '!=', 'montypay')]}"/>
+                           invisible="provider_code != 'montypay'"/>
                 </xpath>
             </field>
         </record>

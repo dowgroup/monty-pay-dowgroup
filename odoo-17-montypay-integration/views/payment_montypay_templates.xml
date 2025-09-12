@@ -16,5 +16,14 @@
             </div>
         </template>
 
+        <!-- MontyPay Payment Form Integration -->
+        <template id="payment_form_montypay_inherit" name="MontyPay Inline Form" inherit_id="payment.payment_form">
+            <xpath expr="//div[hasclass('o_payment_form_container')]" position="inside">
+                <t t-if="provider_sudo.code == 'montypay'">
+                    <t t-call="payment_montypay.payment_form_montypay"/>
+                </t>
+            </xpath>
+        </template>
+
     </data>
 </odoo>
