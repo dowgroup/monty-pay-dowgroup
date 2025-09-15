@@ -1,27 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        
-        <!-- MontyPay Payment Redirect Template -->
-        <template id="montypay_redirect" name="MontyPay Redirect">
-            <html>
-                <head>
-                    <title>Redirecting to MontyPay...</title>
-                </head>
-                <body>
-                    <div class="text-center p-5">
-                        <h3>Redirecting to MontyPay...</h3>
-                        <p>Please wait while we redirect you to MontyPay's secure payment page.</p>
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="sr-only">Loading...</span>
+        <!-- MontyPay Payment Form Template -->
+        <template id="payment_form" name="MontyPay Inline Form" inherit_id="payment.payment_form">
+            <xpath expr="//div[hasclass('o_payment_form_container')]" position="inside">
+                <t t-if="provider_sudo.code == 'montypay'">
+                    <div class="o_payment_form o_payment_form_montypay">
+                        <div class="alert alert-info">
+                            <i class="fa fa-info-circle me-2"></i>
+                            <strong>MontyPay Payment</strong><br/>
+                            You will be redirected to MontyPay's secure payment page to complete your transaction.
                         </div>
                     </div>
-                    <script type="text/javascript">
-                        window.location.href = '<t t-esc="redirect_url"/>';
-                    </script>
-                </body>
-            </html>
+                </t>
+            </xpath>
         </template>
-
     </data>
 </odoo>

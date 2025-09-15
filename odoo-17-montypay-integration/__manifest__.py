@@ -7,10 +7,11 @@
     'author': 'Your Company',
     'website': 'https://www.yourcompany.com',
     'license': 'LGPL-3',
-    'depends': ['payment'],
+    'depends': ['payment', 'website_sale'],
     'data': [
         'security/ir.model.access.csv',
         'views/payment_provider_views.xml',
+        'views/payment_montypay_templates.xml',
         'data/payment_provider_data.xml',
     ],
     'installable': True,

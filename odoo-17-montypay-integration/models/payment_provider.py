@@ -35,6 +35,19 @@ class PaymentProvider(models.Model):
         default='sandbox'
     )
 
+    @property 
+    def _supported_currencies(self):
+        """ Return supported currencies for MontyPay. """
+        if self.code == 'montypay':
+            return self.env['res.currency'].search([('name', 'in', ['USD', 'EUR', 'GBP'])])
+        return super()._supported_currencies
+
+    def _get_default_payment_method_codes(self):
+        """ Return default payment method codes for MontyPay. """
+        if self.code == 'montypay':
+            return ['card']
+        return super()._get_default_payment_method_codes()
+
     def _get_payment_link(self, tx_sudo, **kwargs):
         """ Create MontyPay payment session and return redirect URL. """
         if self.code != 'montypay':
