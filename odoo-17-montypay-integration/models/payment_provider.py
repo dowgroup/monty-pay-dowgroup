@@ -68,7 +68,14 @@ class PaymentProvider(models.Model):
         url = urljoin(self._get_base_url(), endpoint)
         try:
             resp = requests.post(url, json=payload, headers={'Content-Type': 'application/json'}, timeout=30)
-            resp.raise_for_status()
+            if resp.status_code >= 400:
+                # Try to surface MontyPay's error for quicker diagnosis
+                try:
+                    err = resp.json()
+                except ValueError:
+                    err = {'raw': resp.text}
+                _logger.error("MontyPay API %s returned %s: %s", url, resp.status_code, err)
+                raise ValidationError(_(f"MontyPay error {resp.status_code}: {err}"))
             return resp.json()
         except requests.RequestException as e:
             _logger.exception("MontyPay API call failed: %s", e)
@@ -103,7 +110,7 @@ class PaymentProvider(models.Model):
             'merchant_key': self.montypay_merchant_key,
             'operation': 'purchase',
             'success_url': f"{base_url}/payment/montypay/return",
-            # 'cancel_url': f"{base_url}/payment/montypay/cancel",  # optional
+            'cancel_url': f"{base_url}/payment/montypay/cancel",
             'hash': session_hash,
             'order': {
                 'description': description,
@@ -111,6 +118,7 @@ class PaymentProvider(models.Model):
                 'amount': amount_str,
                 'currency': currency,
             },
+            'methods': ['card'],
             'billing_address': {
                 'country': country_code,
                 'address': address,
