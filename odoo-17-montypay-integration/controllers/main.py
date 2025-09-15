@@ -90,8 +90,10 @@ class MontyPayController(http.Controller):
         except Exception:
             # Don't block the user flow on feedback parsing
             pass
-        # Go to standard confirmation step
-        return request.redirect('/shop/confirmation')
+        # Go to standard validation step; this confirms the quotation into
+        # a sales order, creates the invoice/payment, then redirects to
+        # /shop/confirmation.
+        return request.redirect('/shop/payment/validate')
 
     @http.route('/payment/montypay/cancel', type='http', auth='public', methods=['GET', 'POST'], csrf=False)
     def montypay_cancel(self, **kwargs):
