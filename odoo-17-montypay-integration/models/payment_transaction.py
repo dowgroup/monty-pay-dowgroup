@@ -46,14 +46,17 @@ class PaymentTransaction(models.Model):
             return res
 
         redirect_url = self.provider_id._get_payment_link(self)
-        # Provide api_url and a minimal redirect form so the frontend can
-        # locate the expected node and set the "action" before submitting.
+        # Provide api_url and a minimal redirect form with action already set
+        # plus an auto-submit script as a fallback in case JS doesn't wire it.
         redirect_form_html = (
             '<form id="o_payment_redirect_form" class="o_payment_redirect_form" '
-            '      method="get" target="_top">\n'
+            '      method="get" target="_top" action="%s">\n'
             '  <button id="o_payment_redirect_button" type="submit" class="d-none">Pay</button>\n'
-            '</form>'
-        )
+            '</form>\n'
+            '<script>(function(){var f=document.getElementById("o_payment_redirect_form");'
+            ' if(f){try{f.submit();}catch(e){var b=document.getElementById("o_payment_redirect_button");'
+            ' if(b){b.click();}}}})();</script>'
+        ) % (redirect_url)
 
         res.update({
             'api_url': redirect_url,
