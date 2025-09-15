@@ -15,19 +15,22 @@ class PaymentTransaction(models.Model):
         if self.provider_code != 'montypay':
             return res
 
-        # Add MontyPay specific rendering values
+        # Simple redirect approach - just redirect immediately
+        redirect_url = self.provider_id._get_payment_link(self)
+        
+        # Use a simple JavaScript redirect
+        html_form = f'''
+        <div class="text-center" style="padding: 20px;">
+            <h4>Redirecting to MontyPay...</h4>
+            <p>Please wait...</p>
+            <script>
+                window.open('{redirect_url}', '_top');
+            </script>
+        </div>
+        '''
+        
         rendering_values = {
-            'redirect_form_html': f'''
-                <div style="text-align: center; padding: 20px;">
-                    <h3>Redirecting to MontyPay...</h3>
-                    <p>Please wait while we redirect you to MontyPay's secure payment page.</p>
-                    <script>
-                        setTimeout(function() {{
-                            window.location.href = '{self.provider_id._get_payment_link(self)}';
-                        }}, 2000);
-                    </script>
-                </div>
-            '''
+            'redirect_form_html': html_form,
         }
         res.update(rendering_values)
         return res

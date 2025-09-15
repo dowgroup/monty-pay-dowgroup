@@ -53,5 +53,7 @@ class PaymentProvider(models.Model):
         if self.code != 'montypay':
             return super()._get_payment_link(tx_sudo, **kwargs)
 
-        # Simple implementation - return a test URL for now
-        return 'https://checkout.montypay.com/test'
+        # Simple test implementation - replace with real MontyPay API call
+        base_url = tx_sudo.get_base_url()
+        test_url = f"https://checkout.montypay.com/test?reference={tx_sudo.reference}&amount={tx_sudo.amount}&return_url={base_url}/payment/montypay/return"
+        return test_url
