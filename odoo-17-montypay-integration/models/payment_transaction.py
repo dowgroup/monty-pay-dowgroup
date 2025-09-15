@@ -47,21 +47,8 @@ class PaymentTransaction(models.Model):
 
         redirect_url = self.provider_id._get_payment_link(self)
 
-        # Provide the standard keys expected by the frontend for redirect flows
-        # 1) api_url: action URL to set on the form
-        # 2) redirect_form_html: a minimal form with the expected IDs so the JS
-        #    can find and submit it without errors.
-        redirect_form_html = (
-            '<form id="o_payment_redirect_form" class="o_payment_redirect_form" method="post">\n'
-            '  <input type="hidden" name="reference" value="%s"/>\n'
-            '  <input type="hidden" name="amount" value="%s"/>\n'
-            '  <button id="o_payment_redirect_button" type="submit" class="d-none">Pay</button>\n'
-            '</form>'
-        ) % (self.reference, self.amount)
-
+        # Provide only api_url; let the built-in redirect form handle submission.
         res.update({
             'api_url': redirect_url,
-            'redirect_form_html': redirect_form_html,
-            'redirect_form': redirect_form_html,
         })
         return res
