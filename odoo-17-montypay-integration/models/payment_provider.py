@@ -48,12 +48,84 @@ class PaymentProvider(models.Model):
             return ['card']
         return super()._get_default_payment_method_codes()
 
+    # ------ MontyPay helpers ------
+    def _get_base_url(self):
+        """Return MontyPay API base URL based on environment."""
+        # MontyPay provides the same host for sandbox/production in docs,
+        # but keep the switch for future-proofing.
+        return 'https://checkout.montypay.com'
+
+    def _generate_montypay_hash(self, order_number: str, amount: str, currency: str, description: str) -> str:
+        """Compute SHA1(MD5(UPPER(order_number+amount+currency+description+merchant_pass)))."""
+        if not self.montypay_merchant_pass:
+            raise ValidationError(_("MontyPay: Merchant Pass is not configured."))
+        to_concat = f"{order_number}{amount}{currency}{description}{self.montypay_merchant_pass}"
+        md5_hex = hashlib.md5(to_concat.upper().encode()).hexdigest()
+        sha1_hex = hashlib.sha1(md5_hex.encode()).hexdigest()
+        return sha1_hex
+
+    def _montypay_make_request(self, endpoint: str, payload: dict) -> dict:
+        url = urljoin(self._get_base_url(), endpoint)
+        try:
+            resp = requests.post(url, json=payload, headers={'Content-Type': 'application/json'}, timeout=30)
+            resp.raise_for_status()
+            return resp.json()
+        except requests.RequestException as e:
+            _logger.exception("MontyPay API call failed: %s", e)
+            raise ValidationError(_("Could not communicate with MontyPay. Please try again."))
+
     def _get_payment_link(self, tx_sudo, **kwargs):
-        """ Create MontyPay payment session and return redirect URL. """
+        """Create MontyPay session and return redirect URL per MontyPay docs."""
         if self.code != 'montypay':
             return super()._get_payment_link(tx_sudo, **kwargs)
 
-        # Simple test implementation - replace with real MontyPay API call
+        if not self.montypay_merchant_key:
+            raise ValidationError(_("MontyPay: Merchant Key is not configured."))
+
         base_url = tx_sudo.get_base_url()
-        test_url = f"https://checkout.montypay.com/test?reference={tx_sudo.reference}&amount={tx_sudo.amount}&return_url={base_url}/payment/montypay/return"
-        return test_url
+
+        # Order details
+        order_number = tx_sudo.reference
+        amount_str = f"{tx_sudo.amount:.2f}"
+        currency = tx_sudo.currency_id.name
+        description = f"Order {order_number}"
+
+        # Generate hash
+        session_hash = self._generate_montypay_hash(order_number, amount_str, currency, description)
+
+        # Partner/billing details
+        partner = tx_sudo.partner_id
+        country_code = (partner.country_id and partner.country_id.code) or 'US'
+        address = ', '.join([p for p in [partner.street, partner.city] if p]) or 'N/A'
+        phone = partner.phone or partner.mobile or 'N/A'
+
+        payload = {
+            'merchant_key': self.montypay_merchant_key,
+            'operation': 'purchase',
+            'success_url': f"{base_url}/payment/montypay/return",
+            # 'cancel_url': f"{base_url}/payment/montypay/cancel",  # optional
+            'hash': session_hash,
+            'order': {
+                'description': description,
+                'number': order_number,
+                'amount': amount_str,
+                'currency': currency,
+            },
+            'billing_address': {
+                'country': country_code,
+                'address': address,
+                'phone': phone,
+            },
+            'customer': {
+                'email': partner.email or 'customer@example.com',
+                'name': partner.name or 'Customer',
+            },
+        }
+
+        _logger.info("Creating MontyPay session for tx %s", order_number)
+        response = self._montypay_make_request('/api/v1/session', payload)
+        redirect_url = response.get('redirect_url')
+        if not redirect_url:
+            _logger.error("MontyPay: no redirect_url in response: %s", response)
+            raise ValidationError(_("MontyPay: invalid response. No redirect_url provided."))
+        return redirect_url
