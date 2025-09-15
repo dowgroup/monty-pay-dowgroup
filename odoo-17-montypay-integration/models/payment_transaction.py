@@ -15,22 +15,10 @@ class PaymentTransaction(models.Model):
         if self.provider_code != 'montypay':
             return res
 
-        # Simple redirect approach - just redirect immediately
+        # Provide the URL for the standard redirect form
         redirect_url = self.provider_id._get_payment_link(self)
-        
-        # Use a simple JavaScript redirect
-        html_form = f'''
-        <div class="text-center" style="padding: 20px;">
-            <h4>Redirecting to MontyPay...</h4>
-            <p>Please wait...</p>
-            <script>
-                window.open('{redirect_url}', '_top');
-            </script>
-        </div>
-        '''
-        
         rendering_values = {
-            'redirect_form_html': html_form,
+            'api_url': redirect_url,
         }
         res.update(rendering_values)
         return res

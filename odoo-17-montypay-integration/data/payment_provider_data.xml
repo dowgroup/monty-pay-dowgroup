@@ -10,6 +10,7 @@
             <field name="allow_tokenization">False</field>
             <field name="capture_manually">False</field>
             <field name="allow_express_checkout">False</field>
+            <field name="redirect_form_view_id" ref="payment.payment_redirect_form"/>
         </record>
 
         <!-- MontyPay Payment Method -->
