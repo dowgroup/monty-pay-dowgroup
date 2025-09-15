@@ -87,6 +87,22 @@ class MontyPayController(http.Controller):
                     # but we complete the order flow immediately for the customer.
                     if tx_sudo.state not in ('done', 'authorized'):
                         tx_sudo._set_done()
+                    # Confirm related sale orders and create invoice/payment
+                    orders = tx_sudo.sale_order_ids
+                    if orders:
+                        # Confirm quotations -> sales orders
+                        for so in orders.filtered(lambda s: s.state in ('draft', 'sent')):
+                            try:
+                                so.action_confirm()
+                            except Exception:
+                                pass
+                        # Create and post invoices
+                        try:
+                            moves = orders._create_invoices()
+                            if moves:
+                                moves.sudo().action_post()
+                        except Exception:
+                            pass
         except Exception:
             # Don't block the user flow on feedback parsing
             pass
