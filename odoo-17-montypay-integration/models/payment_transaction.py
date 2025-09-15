@@ -15,10 +15,20 @@ class PaymentTransaction(models.Model):
         if self.provider_code != 'montypay':
             return res
 
-        # Provide the URL for the standard redirect form
+        # Provide the URL and an explicit redirect form HTML that matches
+        # what the frontend expects for redirect flows.
         redirect_url = self.provider_id._get_payment_link(self)
+        redirect_form_html = (
+            '<form id="o_payment_redirect_form" class="o_payment_redirect_form" method="post">\n'
+            '  <input type="hidden" name="reference" value="%s"/>\n'
+            '  <input type="hidden" name="amount" value="%s"/>\n'
+            '  <button id="o_payment_redirect_button" type="submit" class="d-none">Pay</button>\n'
+            '</form>'
+        ) % (self.reference, self.amount)
+
         rendering_values = {
             'api_url': redirect_url,
+            'redirect_form_html': redirect_form_html,
         }
         res.update(rendering_values)
         return res
