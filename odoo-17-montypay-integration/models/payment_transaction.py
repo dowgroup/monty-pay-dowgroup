@@ -32,3 +32,20 @@ class PaymentTransaction(models.Model):
         }
         res.update(rendering_values)
         return res
+
+    def _get_specific_processing_values(self, processing_values):
+        """Provide provider-specific values used by the frontend to start the flow.
+
+        Odoo's checkout calls an endpoint that returns `processing_values` for the
+        selected provider. For redirect flows, the frontend expects at least an
+        `api_url` so it can set the action on the standard redirect form.
+        """
+        res = super()._get_specific_processing_values(processing_values)
+        if self.provider_code != 'montypay':
+            return res
+
+        redirect_url = self.provider_id._get_payment_link(self)
+        res.update({
+            'api_url': redirect_url,
+        })
+        return res
