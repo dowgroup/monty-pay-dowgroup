@@ -118,8 +118,8 @@ class PaymentProvider(models.Model):
         payload = {
             'merchant_key': self.montypay_merchant_key,
             'operation': 'purchase',
-            'success_url': f"{base_url}/payment/montypay/return",
-            'cancel_url': f"{base_url}/payment/montypay/cancel",
+            'success_url': f"{base_url}/payment/montypay/return?reference={order_number}",
+            'cancel_url': f"{base_url}/payment/montypay/cancel?reference={order_number}",
             'hash': session_hash,
             'order': {
                 'description': description,
