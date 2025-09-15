@@ -1,4 +1,5 @@
 import hashlib
+import re
 import logging
 import requests
 from urllib.parse import urljoin
@@ -104,7 +105,15 @@ class PaymentProvider(models.Model):
         partner = tx_sudo.partner_id
         country_code = (partner.country_id and partner.country_id.code) or 'US'
         address = ', '.join([p for p in [partner.street, partner.city] if p]) or 'N/A'
-        phone = partner.phone or partner.mobile or 'N/A'
+        # Phone: format to E.164 (+<countrycode><nsn>) if possible; otherwise omit
+        phone_raw = partner.phone or partner.mobile or ''
+        digits = re.sub(r'\D', '', phone_raw)
+        country_code = (partner.country_id and partner.country_id.phone_code) or ''
+        e164_phone = ''
+        if digits:
+            if country_code and not digits.startswith(str(country_code)):
+                digits = f"{country_code}{digits}"
+            e164_phone = f"+{digits}"
 
         payload = {
             'merchant_key': self.montypay_merchant_key,
@@ -122,13 +131,15 @@ class PaymentProvider(models.Model):
             'billing_address': {
                 'country': country_code,
                 'address': address,
-                'phone': phone,
             },
             'customer': {
                 'email': partner.email or 'customer@example.com',
                 'name': partner.name or 'Customer',
             },
         }
+
+        if e164_phone and len(re.sub(r'\D', '', e164_phone)) >= 10:
+            payload['billing_address']['phone'] = e164_phone
 
         _logger.info("Creating MontyPay session for tx %s", order_number)
         response = self._montypay_make_request('/api/v1/session', payload)
