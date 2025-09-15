@@ -19,12 +19,13 @@ class PaymentTransaction(models.Model):
         # what the frontend expects for redirect flows.
         redirect_url = self.provider_id._get_payment_link(self)
         redirect_form_html = (
-            '<form id="o_payment_redirect_form" class="o_payment_redirect_form" method="post">\n'
+            '<form id="o_payment_redirect_form" class="o_payment_redirect_form" '
+            '      method="get" target="_top" action="%s">\n'
             '  <input type="hidden" name="reference" value="%s"/>\n'
             '  <input type="hidden" name="amount" value="%s"/>\n'
             '  <button id="o_payment_redirect_button" type="submit" class="d-none">Pay</button>\n'
             '</form>'
-        ) % (self.reference, self.amount)
+        ) % (redirect_url, self.reference, self.amount)
 
         rendering_values = {
             'api_url': redirect_url,
@@ -61,5 +62,6 @@ class PaymentTransaction(models.Model):
         res.update({
             'api_url': redirect_url,
             'redirect_form_html': redirect_form_html,
+            'redirect_form': redirect_form_html,
         })
         return res

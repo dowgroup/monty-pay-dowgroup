@@ -103,16 +103,16 @@ class PaymentProvider(models.Model):
 
         # Partner/billing details
         partner = tx_sudo.partner_id
-        country_code = (partner.country_id and partner.country_id.code) or 'US'
+        iso_country = (partner.country_id and partner.country_id.code) or 'US'
         address = ', '.join([p for p in [partner.street, partner.city] if p]) or 'N/A'
-        # Phone: format to E.164 (+<countrycode><nsn>) if possible; otherwise omit
+        # Phone: format to E.164 (+<country_dial_code><nsn>) if possible; otherwise omit
         phone_raw = partner.phone or partner.mobile or ''
         digits = re.sub(r'\D', '', phone_raw)
-        country_code = (partner.country_id and partner.country_id.phone_code) or ''
+        dial_cc = (partner.country_id and partner.country_id.phone_code) or ''
         e164_phone = ''
         if digits:
-            if country_code and not digits.startswith(str(country_code)):
-                digits = f"{country_code}{digits}"
+            if dial_cc and not digits.startswith(str(dial_cc)):
+                digits = f"{dial_cc}{digits}"
             e164_phone = f"+{digits}"
 
         payload = {
@@ -129,7 +129,7 @@ class PaymentProvider(models.Model):
             },
             'methods': ['card'],
             'billing_address': {
-                'country': country_code,
+                'country': iso_country,
                 'address': address,
             },
             'customer': {
