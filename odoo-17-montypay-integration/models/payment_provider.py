@@ -119,7 +119,7 @@ class PaymentProvider(models.Model):
             'merchant_key': self.montypay_merchant_key,
             'operation': 'purchase',
             'success_url': f"{base_url}/payment/montypay/return?reference={order_number}",
-            'cancel_url': f"{base_url}/payment/montypay/cancel?reference={order_number}",
+            'cancel_url': f"{base_url}/payment/montypay/return?reference={order_number}",
             
              # NEW: guess extra URLs MontyPay may honor for non-success endings
             'failure_url': f"{base_url}/payment/montypay/cancel?reference={order_number}&status=failed",
@@ -155,4 +155,5 @@ class PaymentProvider(models.Model):
             _logger.error("MontyPay: no redirect_url in response: %s", response)
             raise ValidationError(_("MontyPay: invalid response. No redirect_url provided."))
         return redirect_url
+
 
