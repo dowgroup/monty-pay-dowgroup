@@ -137,56 +137,24 @@ class MontyPayController(http.Controller):
         # typically end up in /shop/confirmation for the user.
         return request.redirect('/shop/payment/validate')
 
-    @http.route(
-        '/payment/montypay/cancel',
-        type='http', auth='public', methods=['GET', 'POST'],
-        csrf=False
-    )
+    @http.route('/payment/montypay/cancel', type='http', auth='public', methods=['GET', 'POST'], csrf=False)
     def montypay_cancel(self, **kwargs):
-        """
-        Browser return when user cancels in MontyPay.
-        We DO NOT send them back to MontyPay.
-        We just forward them to the same Odoo validation step
-        that leads to /shop/confirmation (same as success).
-        """
-        _logger.info("MontyPay cancellation received: %s", kwargs)
+        # mark the tx as cancelled / error (optional)
+        reference = kwargs.get('reference')
+        if reference:
+            tx_sudo = request.env['payment.transaction'].sudo().search([
+                ('reference', '=', reference),
+                ('provider_code', '=', 'montypay')
+            ], limit=1)
+            if tx_sudo:
+                # mark it as error instead of done, so the confirmation page shows red, not green
+                tx_sudo._set_error("Payment was cancelled or failed.")
+    
+                # make sure /shop/confirmation can still show that order:
+                orders = tx_sudo.sale_order_ids
+                if orders:
+                    request.session['sale_last_order_id'] = orders[0].id
+    
+        # now send the browser somewhere on YOUR site, not back to MontyPay
+        return request.redirect('/shop/confirmation')
 
-        reference = (
-            kwargs.get('reference')
-            or kwargs.get('order_number')
-            or (kwargs.get('order') or {}).get('number')
-        )
-
-        try:
-            if reference:
-                tx_sudo = request.env['payment.transaction'].sudo().search([
-                    ('reference', '=', reference),
-                    ('provider_code', '=', 'montypay')
-                ], limit=1)
-
-                if tx_sudo:
-                    # For cancel/failure we still want to "finish" the flow
-                    # and land them on /shop/payment/validate, per your request.
-                    # We'll mark it done here for consistency with success.
-                    if tx_sudo.state not in ('done', 'authorized'):
-                        tx_sudo._set_done()
-
-                    # Try to confirm order & create/post invoices same way
-                    orders = tx_sudo.sale_order_ids
-                    if orders:
-                        for so in orders.filtered(lambda s: s.state in ('draft', 'sent')):
-                            try:
-                                so.action_confirm()
-                            except Exception:
-                                pass
-                        try:
-                            moves = orders._create_invoices()
-                            if moves:
-                                moves.sudo().action_post()
-                        except Exception:
-                            pass
-        except Exception:
-            _logger.exception("Error finalizing order on MontyPay cancel")
-
-        # IMPORTANT: we now do EXACTLY the same redirect as success.
-        return request.redirect('/shop/payment/validate')
